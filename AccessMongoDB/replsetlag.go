@@ -2,8 +2,10 @@ package AccessMongoDB
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"mongostatus/Output"
 	"mongostatus/dateformat"
 	"mongostatus/mgodb"
 	"time"
@@ -21,7 +23,7 @@ var oplog struct {
 	V    interface{} `bson:"v"`
 }
 
-func Getoplogwin(ctx context.Context, client *mongo.Client) {
+func Getoplogwin(ctx context.Context, client *mongo.Client, fl, fi string) {
 	//msg := oplog
 	//err := oplog.CollectionDocuments(ctx, client, 0, 1, 1).Decode(&msg)
 	//if err != nil {
@@ -29,19 +31,26 @@ func Getoplogwin(ctx context.Context, client *mongo.Client) {
 	//
 	//}
 	var firstOplogDate, lastOplogDate string
-	var firstOplogUnixTs ,lastOplogUnixTs int
+	var firstOplogUnixTs, lastOplogUnixTs int
 	/* get first oplog Datetime */
-	firstOplogDate,firstOplogUnixTs=getOplogDate(ctx,client,1,"$natural")   // 这里ts --> 改成$natural 更快 db.colleation.find().sort('$natural',1) - 根据自然集排序进行数据查询
-	lastOplogDate,lastOplogUnixTs=getOplogDate(ctx,client,-1,"$natural")    // 这里ts --> 改成$natural 更快
-	memUptimeFormatDay, memUptimeFormatHour, memUptimeFormatMin, memUptimeFormatSec :=dateformat.ResolveTime(lastOplogUnixTs-firstOplogUnixTs)
-    log.Printf("** [opLog.rs] First OplogDate(Location: ASIA/Shanghai) : %s\n",firstOplogDate)
-	log.Printf("** [opLog.rs] Last  OplogDate(Location: ASIA/Shanghai) : %s\n",lastOplogDate)
-	log.Printf("** [opLog.rs] Oplog Window : %v Days %v Hours %v Mins %v Secs",memUptimeFormatDay,memUptimeFormatHour,memUptimeFormatMin,memUptimeFormatSec)
-
+	firstOplogDate, firstOplogUnixTs = getOplogDate(ctx, client, 1, "$natural") // 这里ts --> 改成$natural 更快 db.colleation.find().sort('$natural',1) - 根据自然集排序进行数据查询
+	lastOplogDate, lastOplogUnixTs = getOplogDate(ctx, client, -1, "$natural")  // 这里ts --> 改成$natural 更快
+	memUptimeFormatDay, memUptimeFormatHour, memUptimeFormatMin, memUptimeFormatSec := dateformat.ResolveTime(lastOplogUnixTs - firstOplogUnixTs)
+	msgOpFirst := fmt.Sprintf("[opLog.rs] First OplogDate(Location: ASIA/Shanghai) : %s", firstOplogDate)
+	msgOpLast := fmt.Sprintf("[opLog.rs] Last  OplogDate(Location: ASIA/Shanghai) : %s", lastOplogDate)
+	msgOpWin := fmt.Sprintf("[opLog.rs] Oplog Window : %v Days %v Hours %v Mins %v Secs", memUptimeFormatDay, memUptimeFormatHour, memUptimeFormatMin, memUptimeFormatSec)
+	Output.DoResult(msgOpFirst, fl)
+	Output.DoResult(msgOpLast, fl)
+	Output.DoResult(msgOpWin, fl)
+	Output.Writeins(_oplogInfo, fi)
+	Output.Writeins("```", fi)
+	Output.Writeins(msgOpFirst, fi)
+	Output.Writeins(msgOpLast, fi)
+	Output.Writeins(msgOpWin, fi)
+	Output.Writeins("```", fi)
 }
 
-
-func getOplogDate(ctx context.Context,client *mongo.Client,sort int,sortkey string)(logDate string,unixTs int){
+func getOplogDate(ctx context.Context, client *mongo.Client, sort int, sortkey string) (logDate string, unixTs int) {
 	var oplogDate string
 	var ts2unix int64
 	oplog := mgodb.NewMgo("local", "oplog.rs")
@@ -70,6 +79,6 @@ func getOplogDate(ctx context.Context,client *mongo.Client,sort int,sortkey stri
 	if err := cur.Err(); err != nil {
 		log.Fatal(err)
 	}
-	return oplogDate,int(ts2unix)
+	return oplogDate, int(ts2unix)
 
 }

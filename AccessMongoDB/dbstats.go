@@ -2,9 +2,11 @@ package AccessMongoDB
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"mongostatus/Output"
 )
 
 /*Obtain various inspection indicators of the database*/
@@ -49,15 +51,21 @@ func GetDBSTATS(c context.Context, client *mongo.Client) (db []string) {
 	return dbslice
 }
 
-func GetDBfullinfo(c context.Context, client *mongo.Client, dbname []string) {
+func GetDBfullinfo(c context.Context, client *mongo.Client, dbname []string, fl, fi string) {
+	Output.Writeins(_dbstatInfo, fi)
+	msg := fmt.Sprintf("[DBSTATS 数据库的统计信息]")
+	Output.DoResult(msg, fl)
+	Output.Writeins(msg, fi)
 	for _, v := range dbname {
-		if err := RunCommandDBstats(c, client, v); err != nil {
+		Output.Writeins("```txt", fi)
+		if err := RunCommandDBstats(c, client, v, fl, fi); err != nil {
 			log.Println(err.Error())
 		}
+		Output.Writeins("```", fi)
 	}
 }
 
-func RunCommandDBstats(ctx context.Context, cl *mongo.Client, dbname string) error {
+func RunCommandDBstats(ctx context.Context, cl *mongo.Client, dbname string, fl, fi string) error {
 	//cmd := bson.D{{Key: "dbstats", Value: "1"}}
 	//if err := cl.Database(dbname).RunCommand(ctx,cmd ).Decode(&md); err != nil {
 	//	return  err
@@ -71,10 +79,10 @@ func RunCommandDBstats(ctx context.Context, cl *mongo.Client, dbname string) err
 		log.Printf("Failed to get $dbstats for database %s: %s", dbname, err)
 	}
 	if dbStats.OK {
-		log.Printf("** [DBSTATS 数据库的统计信息]")
-		log.Printf("** [数据库 : %s] 集合数量: %v,视图数量: %v,索引总数: %v\n整个数据库文档数量: %v , 文档存储的空间总和: %vG\n索引的空间总和: %vG,文档和索引分配的空间总和: %vG\n存储数据的文件系统上已用的磁盘容量的总大小: %vG\n存储数据的文件系统上所有磁盘容量的总大小: %vG", dbStats.DB, dbStats.COLLECTIONS, dbStats.VIEWS, dbStats.INDEXES, dbStats.OBJECTS, dbStats.STORAGESIZE, dbStats.INDEXESIZE, dbStats.TOTALSIZE, dbStats.FSUSEDSIZE, dbStats.FSTOTALSIZE)
+		msg := fmt.Sprintf("[数据库 : %s] 集合数量: %v,视图数量: %v,索引总数: %v\n整个数据库文档数量: %v , 文档存储的空间总和: %vG\n索引的空间总和: %vG,文档和索引分配的空间总和: %vG\n存储数据的文件系统上已用的磁盘容量的总大小: %vG\n存储数据的文件系统上所有磁盘容量的总大小: %vG", dbStats.DB, dbStats.COLLECTIONS, dbStats.VIEWS, dbStats.INDEXES, dbStats.OBJECTS, dbStats.STORAGESIZE, dbStats.INDEXESIZE, dbStats.TOTALSIZE, dbStats.FSUSEDSIZE, dbStats.FSTOTALSIZE)
+		Output.DoResult(msg, fl)
+		Output.Writeins(msg, fi)
 	}
-	huanhang()
 	return nil
 }
 

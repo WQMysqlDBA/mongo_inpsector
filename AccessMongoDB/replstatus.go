@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"mongostatus/Output"
 	"mongostatus/dateformat"
 	"mongostatus/proto"
 	"strconv"
@@ -26,7 +27,7 @@ type replSetGetStatusCollector struct {
 	topologyInfo   labelsGetter
 }
 
-func (d *replSetGetStatusCollector) Collect() {
+func (d *replSetGetStatusCollector) Collect(fl, fi string) {
 	cmd := bson.D{{Key: "replSetGetStatus", Value: "1"}}
 	res := d.client.Database("admin").RunCommand(d.ctx, cmd)
 
@@ -43,9 +44,11 @@ func (d *replSetGetStatusCollector) Collect() {
 		return
 	}
 
-	log.Println("** [ReplSet INFO]  replSetGetStatus result:")
-	GetReplmembers(d.ctx, d.client)
-	GetReplelection(d.ctx, d.client)
+	msg := fmt.Sprintf("[ReplSet INFO]  replSetGetStatus result:")
+	Output.DoResult(msg, fl)
+
+	_, _ = GetReplmembers(d.ctx, d.client, fl, fi)
+	_, _, _ = GetReplelection(d.ctx, d.client, fl, fi)
 
 }
 
@@ -55,12 +58,12 @@ func newreplSetGetStatusCollector(c context.Context, cl *mongo.Client) *replSetG
 		c, cl, true, a,
 	}
 }
-func ReplSetStatus(c context.Context, client *mongo.Client) {
+func ReplSetStatus(c context.Context, client *mongo.Client, f, f1 string) {
 	replset := newreplSetGetStatusCollector(c, client)
-	replset.Collect()
+	replset.Collect(f, f1)
 }
 
-func GetReplmembers(ctx context.Context, client *mongo.Client) (string, error) {
+func GetReplmembers(ctx context.Context, client *mongo.Client, fl, fi string) (string, error) {
 	var replmembers proto.ReplicaSetStatus
 	if err := client.Database("admin").RunCommand(ctx, primitive.M{"replSetGetStatus": 1}).Decode(&replmembers); err != nil {
 		return "", err
@@ -69,12 +72,12 @@ func GetReplmembers(ctx context.Context, client *mongo.Client) (string, error) {
 	type myreplinfo map[string]interface{}
 
 	type replInfostruct struct {
-		ID string
-		Name string
+		ID       string
+		Name     string
 		StateStr string
-		Uptime string
-		Health float64
-		Optime int
+		Uptime   string
+		Health   float64
+		Optime   int
 	}
 	replallmemInfo := make([]myreplinfo, 0)
 	for _, mem := range replmembers.Members {
@@ -82,8 +85,7 @@ func GetReplmembers(ctx context.Context, client *mongo.Client) (string, error) {
 		replInfo := make(myreplinfo)
 
 		memUptime := int(mem.Uptime)
-		memOptime := int(mem.OptimeDate)/1000    // 查出来的是ISODATE 转换为unix时间戳/1000,单位为s，多组的差值即为s
-
+		memOptime := int(mem.OptimeDate) / 1000 // 查出来的是ISODATE 转换为unix时间戳/1000,单位为s，多组的差值即为s
 
 		memUptimeFormatDay, memUptimeFormatHour, memUptimeFormatMin, memUptimeFormatSec := dateformat.ResolveTime(memUptime)
 		//fmt.Println(mem_uptime_format_day,mem_uptime_format_hour,mem_uptime_format_min,mem_uptime_format_sec)
@@ -120,33 +122,38 @@ func GetReplmembers(ctx context.Context, client *mongo.Client) (string, error) {
 		replInfo["Health"] = mem.Health
 		replInfo["Optime"] = memOptime
 
-
-		replallmemInfo=append(replallmemInfo,replInfo)
+		replallmemInfo = append(replallmemInfo, replInfo)
 
 	}
 
 	//获取Primary节点的Optime时间戳，表示当前接节点的最新oplog时间
-	priOptime:=0
-	for _,v :=range replallmemInfo{
-		if v["StateStr"]=="PRIMARY"{
-			priOptime=v["Optime"].(int)
+	priOptime := 0
+	for _, v := range replallmemInfo {
+		if v["StateStr"] == "PRIMARY" {
+			priOptime = v["Optime"].(int)
 		}
 	}
+
 	var oplag string
-	for _,v :=range replallmemInfo{
-		if v["StateStr"]=="SECONDARY"{
-			secOptime:=v["Optime"].(int)
-			d,h,m,s:=dateformat.ResolveTime(priOptime-secOptime)
-			oplag=fmt.Sprintf("%v Days %v Mins %v Hours %v Secs",d,h,m,s)
-			log.Printf("** [ReplSetMembers] members[%v]: %s, role:SECONDARY, status: %v, uptime: %v, replsetLag: %v\n", v["ID"], v["Name"], v["Health"], v["Uptime"],oplag)
-		}else {
-			log.Printf("** [ReplSetMembers] members[%v]: %s, role:PRIMARY, status: %v, uptime: %v\n", v["ID"], v["Name"], v["Health"], v["Uptime"])
+	for _, v := range replallmemInfo {
+		if v["StateStr"] == "SECONDARY" {
+			secOptime := v["Optime"].(int)
+			d, h, m, s := dateformat.ResolveTime(priOptime - secOptime)
+			oplag = fmt.Sprintf("%v Days %v Mins %v Hours %v Secs", d, h, m, s)
+			msg := fmt.Sprintf("[ReplSetMembers] members[%v]: %s, role:SECONDARY, status: %v, uptime: %v, replsetLag: %v", v["ID"], v["Name"], v["Health"], v["Uptime"], oplag)
+			Output.DoResult(msg, fl)
+			Output.Writeins(msg, fi)
+
+		} else {
+			msg := fmt.Sprintf("[ReplSetMembers] members[%v]: %s, role:PRIMARY, status: %v, uptime: %v", v["ID"], v["Name"], v["Health"], v["Uptime"])
+			Output.DoResult(msg, fl)
+			Output.Writeins(msg, fi)
 		}
 	}
 	return "", nil
 }
 
-func GetReplelection(ctx context.Context, client *mongo.Client) (elresion string, eltime string, err error) {
+func GetReplelection(ctx context.Context, client *mongo.Client ,fl ,fi string) (elresion string, eltime string, err error) {
 	var replmembers proto.ReplicaSetStatus
 	var ts2unix int64
 	if err := client.Database("admin").RunCommand(ctx, primitive.M{"replSetGetStatus": 1}).Decode(&replmembers); err != nil {
@@ -162,6 +169,9 @@ func GetReplelection(ctx context.Context, client *mongo.Client) (elresion string
 	nowts := time.Now().Unix()
 	d, h, m, s := dateformat.ResolveTime(int(nowts - ts2unix))
 	fromLastelection := fmt.Sprintf("%v Days %v Hours %v Mins %v Secs", d, h, m, s)
-	log.Printf("** [ReplSetElection] ElectionResion: \"%s\",LastElectionDate: \"%s\",fromLastelection: \"%s\"", eleResion, eledate, fromLastelection) // 加上距离上次选举 有多长时间
+	msg:=fmt.Sprintf("[ReplSetElection] ElectionResion: \"%s\",LastElectionDate: \"%s\",fromLastelection: \"%s\"", eleResion, eledate, fromLastelection) // 加上距离上次选举 有多长时间
+	Output.DoResult(msg, fl)
+	Output.Writeins(msg, fi)
+	Output.Writeins("```", fi)
 	return eleResion, eledate, nil
 }

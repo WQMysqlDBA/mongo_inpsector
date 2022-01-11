@@ -3,9 +3,11 @@ package AccessMongoDB
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
+	"mongostatus/Output"
 	"strconv"
 	"strings"
 )
@@ -17,12 +19,14 @@ type indexstatsCollector struct {
 	discoveringMode bool
 }
 
-func (d *indexstatsCollector) Collect() {
+func (d *indexstatsCollector) Collect(fl, fi string) {
+
 	collections := d.collections
 	if d.discoveringMode {
 		namespaces, err := listAllCollections(d.ctx, d.client, d.collections)
 		if err != nil {
-			log.Println("cannot auto discover databases and collections")
+			msg := fmt.Sprintf("cannot auto discover databases and collections")
+			Output.DoResult(msg, fl)
 			return
 		}
 		collections = Map2Slice(namespaces) //[ycsb.test]
@@ -49,7 +53,8 @@ func (d *indexstatsCollector) Collect() {
 
 		cursor, err := d.client.Database(database).Collection(collection).Aggregate(d.ctx, mongo.Pipeline{aggregation})
 		if err != nil {
-			log.Println("cannot get $indexStats cursor for collection %s.%s: %s", database, collection, err)
+			msg := fmt.Sprintf("cannot get $indexStats cursor for collection %s.%s: %s", database, collection, err)
+			Output.DoResult(msg, fl)
 			continue
 		}
 
@@ -67,7 +72,6 @@ func (d *indexstatsCollector) Collect() {
 				log.Fatal(err)
 			}
 
-
 			/* 这样得不到 。。。。 */
 			//m, ok := result["key"].(bson.M)
 			//if ok {
@@ -76,14 +80,30 @@ func (d *indexstatsCollector) Collect() {
 			//	}
 			//}
 
-
 			indexslice = append(indexslice, Strval(RtuStringFromBsonM(result)))
 			i++
 		}
 		if i != 0 {
-			log.Printf("** [IndexInfo] collection: %s has %v index,is %s\n", dbCollection, i, indexslice)
+			// has indexes
+			msg := fmt.Sprintf(" ** [IndexInfo] collection: %s has %v index,is %s", dbCollection, i, indexslice)
+			Output.DoResult(msg, fl)
+			variable := fmt.Sprintf(" ** [VARIABLES]: VAR_INDEX:%s%s%v%s%s", dbCollection, _splitflag, i, _splitflag, indexslice)
+			Output.DoResult(variable, fl)
+
+			Output.Writeins(fmt.Sprintf("**[IndexInfo] collection: %s has %v index**\n", dbCollection, i), fi)
+			Output.Writeins("```txt", fi)
+			for k, v := range indexslice {
+				m := "index[" + strconv.Itoa(k) + "]: " + v
+				Output.Writeins(m, fi)
+			}
+			Output.Writeins("```", fi)
+
 		} else {
-			log.Printf("** [IndexInfo] collection: %s has %v index\n", dbCollection, i)
+			// No indexes
+			msg := fmt.Sprintf(" ** [IndexInfo] collection: %s has %v index", dbCollection, i)
+			Output.DoResult(msg, fl)
+			variable := fmt.Sprintf("VAR_INDEX:%s#%v", dbCollection, i)
+			Output.DoResult(variable, fl)
 		}
 
 		if err := cursor.Err();
@@ -93,11 +113,11 @@ func (d *indexstatsCollector) Collect() {
 
 		var stats []bson.M
 		if err = cursor.All(d.ctx, &stats); err != nil {
-			log.Printf("cannot get $indexStats for collection %s.%s: %s", database, collection, err)
+			msg := fmt.Sprintf("cannot get $indexStats for collection %s.%s: %s", database, collection, err)
+			Output.DoResult(msg, fl)
 			continue
 		}
-
-		cursor.Close(context.TODO())
+		_ = cursor.Close(context.TODO())
 	}
 }
 
@@ -109,9 +129,9 @@ func newindexstatsCollector(c context.Context, cl *mongo.Client, dbname string) 
 	}
 }
 
-func DBIndex(c context.Context, client *mongo.Client, dbname string) {
+func DBIndex(c context.Context, client *mongo.Client, dbname string, f, f1 string) {
 	indexstats := newindexstatsCollector(c, client, dbname)
-	indexstats.Collect()
+	indexstats.Collect(f, f1)
 }
 
 func RtuStringFromBsonM(b bson.M) (idx interface{}) {
