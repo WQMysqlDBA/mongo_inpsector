@@ -1,5 +1,7 @@
 # mongo_inpsector
+
 * 如下的结构体可以复用，字段解析和数据类型解析都是经过验证的
+
 ```go
 type DBSTATS struct {
 	DB          string  `bson:"db"`
@@ -19,6 +21,7 @@ type DBSTATS struct {
 }
 
 ```
+
 ```go
 type ServerStatus struct {
 	Host               string                 `bson:"host"`

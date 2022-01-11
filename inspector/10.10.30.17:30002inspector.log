@@ -1,0 +1,79 @@
+2022-1-11 13:48:47 ** [Info]: Write inspector result in file /Users/anderalex/go/src/mongostatus/inspector/10.10.30.17:30002.md
+2022-1-11 13:48:47 ** [Info]: Write inspector log in file /Users/anderalex/go/src/mongostatus/inspector/10.10.30.17:30002inspector.log
+2022-1-11 13:48:47 ** [DBinfo] sys database: [admin config local]
+2022-1-11 13:48:47 ** [DBinfo] nosys database: [a ycsb]
+2022-1-11 13:48:47 ** [getDiagnosticData]
+2022-1-11 13:48:47 ** [HostName] : 10-10-30-17:30001
+2022-1-11 13:48:47 ** [Mongod Version] : 4.4.6
+2022-1-11 13:48:47 ** [Mongod Process] : processname : mongod, pid : 18222
+2022-1-11 13:48:47 ** [Mongod Uptime] : 0 Days 3 Hours 32 Mins 51 secs
+2022-1-11 13:48:47[architecture]: rs/shardsvr
+2022-1-11 13:48:47[MongoDB MEMORY INFO]
+2022-1-11 13:48:47[MongoDB MEMORY] OS bits : 64
+2022-1-11 13:48:47[MongoDB MEMORY] Mem resident : 98 (MiB) (该值大致相当于数据库进程当前使用的 RAM 量)
+2022-1-11 13:48:47[MongoDB MEMORY] Mem virtual : 1490 (MiB) (进程使用的虚拟内存的数量)
+2022-1-11 13:48:47[MongoDB MEMORY] Mem supported : true (底层系统是否支持扩展内存信息)
+2022-1-11 13:48:47[MongoDB CONNECTIONS INFO]
+2022-1-11 13:48:47[MongoDB CONNECTIONS] TOTAL CREATED 204 
+2022-1-11 13:48:47[MongoDB CONNECTIONS] Current 7 
+2022-1-11 13:48:47[MongoDB CONNECTIONS] Available 524281 
+2022-1-11 13:48:47[MongoDB STORAGE Engine INFO]
+2022-1-11 13:48:47[MongoDB STORAGE] Engine Name : wiredTiger
+2022-1-11 13:48:47[MongoDB STORAGE] Engine Persistent : true (该参数表示存储引擎是否支持持久化数据到硬盘)
+2022-1-11 13:48:47[MongoDB STORAGE] Engine SupportCommittedREads : true (该参数表示存储引擎是否支持read concern)
+2022-1-11 13:48:47[Asserts] regular : 0
+2022-1-11 13:48:47[Asserts] warning : 0
+2022-1-11 13:48:47[Asserts] msg : 0
+2022-1-11 13:48:47[Asserts] user : 159
+2022-1-11 13:48:47[Asserts] rollovers : 0
+2022-1-11 13:48:47"regular" : 服务启动后正常的asserts错误个数,可通过log查看更多该信息
+"warning" : 服务启动后的warning个数
+"msg" : 服务启动后的message assert个数
+"user" : 服务启动后的user asserts个数
+"rollovers" : 服务启动后的重置次数
+2022-1-11 13:48:47** [Replset INFO]:
+2022-1-11 13:48:47[Replset INFO] node role : PRIMARY
+2022-1-11 13:48:47[ReplSet INFO]  replSetGetStatus result:
+2022-1-11 13:48:47[ReplSetMembers] members[0]: 10-10-30-17:30001, role:PRIMARY, status: 1, uptime: 0 Days 3 Hours 32 Mins 51 Secs
+2022-1-11 13:48:47[ReplSetMembers] members[1]: 10.10.30.17:30002, role:SECONDARY, status: 1, uptime: 0 Days 2 Hours 33 Mins 52 Secs, replsetLag: 0 Days 0 Mins 0 Hours 0 Secs
+2022-1-11 13:48:47[ReplSetMembers] members[2]: 10.10.30.17:30003, role:SECONDARY, status: 1, uptime: 0 Days 2 Hours 33 Mins 50 Secs, replsetLag: 0 Days 0 Mins 0 Hours 0 Secs
+2022-1-11 13:48:47[ReplSetElection] ElectionResion: "electionTimeout",LastElectionDate: "2022-01-11 10:13:46",fromLastelection: "0 Days 3 Hours 35 Mins 1 Secs"
+2022-1-11 13:48:47[opLog.rs] First OplogDate(Location: ASIA/Shanghai) : 2022-01-11 10:13:46
+2022-1-11 13:48:47[opLog.rs] Last  OplogDate(Location: ASIA/Shanghai) : 2022-01-11 13:46:26
+2022-1-11 13:48:47[opLog.rs] Oplog Window : 0 Days 3 Hours 32 Mins 40 Secs
+2022-1-11 13:48:47[DBSTATS 数据库的统计信息]
+2022-1-11 13:48:47[数据库 : a] 集合数量: 1,视图数量: 0,索引总数: 2
+整个数据库文档数量: 0 , 文档存储的空间总和: 4e-06G
+索引的空间总和: 0G,文档和索引分配的空间总和: 1.2e-05G
+存储数据的文件系统上已用的磁盘容量的总大小: 752.538968G
+存储数据的文件系统上所有磁盘容量的总大小: 3123.473804G
+2022-1-11 13:48:47[数据库 : admin] 集合数量: 1,视图数量: 0,索引总数: 1
+整个数据库文档数量: 1 , 文档存储的空间总和: 2e-05G
+索引的空间总和: 0G,文档和索引分配的空间总和: 4e-05G
+存储数据的文件系统上已用的磁盘容量的总大小: 752.538968G
+存储数据的文件系统上所有磁盘容量的总大小: 3123.473804G
+2022-1-11 13:48:47[数据库 : config] 集合数量: 2,视图数量: 0,索引总数: 2
+整个数据库文档数量: 0 , 文档存储的空间总和: 8e-06G
+索引的空间总和: 0G,文档和索引分配的空间总和: 1.6e-05G
+存储数据的文件系统上已用的磁盘容量的总大小: 752.538968G
+存储数据的文件系统上所有磁盘容量的总大小: 3123.473804G
+2022-1-11 13:48:47[数据库 : local] 集合数量: 8,视图数量: 0,索引总数: 7
+整个数据库文档数量: 1295 , 文档存储的空间总和: 0.000272G
+索引的空间总和: 0G,文档和索引分配的空间总和: 0.000412G
+存储数据的文件系统上已用的磁盘容量的总大小: 752.538968G
+存储数据的文件系统上所有磁盘容量的总大小: 3123.473804G
+2022-1-11 13:48:47[数据库 : ycsb] 集合数量: 2,视图数量: 0,索引总数: 5
+整个数据库文档数量: 3 , 文档存储的空间总和: 4e-05G
+索引的空间总和: 0G,文档和索引分配的空间总和: 0.000124G
+存储数据的文件系统上已用的磁盘容量的总大小: 752.538968G
+存储数据的文件系统上所有磁盘容量的总大小: 3123.473804G
+2022-1-11 13:48:47 ** [IndexInfo] collection: a.a has 2 index,is [{"key":{"x":1},"name":"x_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [VARIABLES]: VAR_INDEX:a.a____helloworld____2____helloworld____[{"key":{"x":1},"name":"x_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [IndexInfo] collection: ycsb.a has 3 index,is [{"key":{"x":1},"name":"x_1","v":2} {"key":{"x":1,"y":1},"name":"x_1_y_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [VARIABLES]: VAR_INDEX:ycsb.a____helloworld____3____helloworld____[{"key":{"x":1},"name":"x_1","v":2} {"key":{"x":1,"y":1},"name":"x_1_y_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [IndexInfo] collection: a.a has 2 index,is [{"key":{"x":1},"name":"x_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [VARIABLES]: VAR_INDEX:a.a____helloworld____2____helloworld____[{"key":{"x":1},"name":"x_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [IndexInfo] collection: ycsb.b has 2 index,is [{"key":{"x":1},"name":"x_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [VARIABLES]: VAR_INDEX:ycsb.b____helloworld____2____helloworld____[{"key":{"x":1},"name":"x_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [IndexInfo] collection: ycsb.a has 3 index,is [{"key":{"x":1},"name":"x_1","v":2} {"key":{"x":1,"y":1},"name":"x_1_y_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]
+2022-1-11 13:48:47 ** [VARIABLES]: VAR_INDEX:ycsb.a____helloworld____3____helloworld____[{"key":{"x":1},"name":"x_1","v":2} {"key":{"x":1,"y":1},"name":"x_1_y_1","v":2} {"key":{"_id":1},"name":"_id_","v":2}]

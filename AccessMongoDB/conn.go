@@ -119,7 +119,7 @@ func ConnMongo() {
 		Getoplogwin(ctx, client, InsLog, InspectorFileName)
 	}
 
-	GetDBfullinfo(ctx, client, _dbname,InsLog, InspectorFileName)
+	GetDBfullinfo(ctx, client, _dbname, InsLog, InspectorFileName)
 
 	// Indexinfo
 	Output.Writeins(_indexCollect, InspectorFileName)

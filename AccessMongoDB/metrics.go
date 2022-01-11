@@ -46,10 +46,12 @@ type rawMetric struct {
 	// Value type
 	vt prometheus.ValueType
 }
+
 var (
 	errCannotHandleType   = fmt.Errorf("don't know how to handle data type")
 	errUnexpectedDataType = fmt.Errorf("unexpected data type")
 )
+
 //nolint:funlen
 func conversions() []conversion {
 	return []conversion{
@@ -785,6 +787,7 @@ type conversion struct {
 	suffixLabel           string
 	suffixMapping         map[string]string
 }
+
 func newToOldMetric(rm *rawMetric, c conversion) *rawMetric {
 	oldMetric := &rawMetric{
 		fqName: c.oldName,
@@ -862,8 +865,6 @@ func createOldMetricFromNew(rm *rawMetric, c conversion) *rawMetric {
 
 	return oldMetric
 }
-
-
 
 // specialConversions returns a list of special conversions we want to implement.
 // See: https://jira.percona.com/browse/PMM-6506

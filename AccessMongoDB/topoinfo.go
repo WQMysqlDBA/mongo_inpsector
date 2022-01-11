@@ -178,10 +178,6 @@ func getClusterRole(ctx context.Context, client *mongo.Client) (string, error) {
 	return clusterRole, nil
 }
 
-
-
-
-
 func walkTo(m primitive.M, path []string) interface{} {
 	val, ok := m[path[0]]
 	if !ok {

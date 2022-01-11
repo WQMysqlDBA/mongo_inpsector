@@ -1,4 +1,5 @@
 package AccessMongoDB
+
 //db.RunCommandDBstats({buildInfo:1})
 //db.RunCommandDBstats({collStats:"persons"})
 //type Build struct {

@@ -34,5 +34,3 @@ func WaitCloseSignalsAndRelease(closer Closer) {
 	<-signals
 	closer.Close()
 }
-
-

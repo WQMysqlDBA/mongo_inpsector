@@ -54,7 +54,7 @@ func (m *mgo) CollectionCount(ctx context.Context, client *mongo.Client) (string
 }
 
 //按选项查询集合 Skip 跳过 Limit 读取数量 sort 1 ，-1 . 1 为最初时间读取 ， -1 为最新时间读取
-func (m *mgo) CollectionDocuments(ctx context.Context, client *mongo.Client, Skip, Limit int64, sort int,sortkey string) *mongo.Cursor {
+func (m *mgo) CollectionDocuments(ctx context.Context, client *mongo.Client, Skip, Limit int64, sort int, sortkey string) *mongo.Cursor {
 	collection := client.Database(m.database).Collection(m.collection)
 	//fmt.Println(m.database,m.collection)
 	SORT := bson.D{{sortkey, sort}} //filter := bson.D{{key,value}}

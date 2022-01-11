@@ -39,7 +39,7 @@ func listCollections(ctx context.Context, client *mongo.Client, collections []st
 }
 
 func databases(ctx context.Context, client *mongo.Client, exclude []string) ([]string, error) {
-	opts := &options.ListDatabasesOptions{NameOnly: ToBool(true), AuthorizedDatabases:ToBool(true)}
+	opts := &options.ListDatabasesOptions{NameOnly: ToBool(true), AuthorizedDatabases: ToBool(true)}
 	filterExpressions := []bson.D{}
 	for _, dbname := range exclude {
 		filterExpressions = append(filterExpressions,
@@ -99,8 +99,6 @@ func allCollectionsCount(ctx context.Context, client *mongo.Client, filter []str
 	return count, nil
 }
 
-
-
 func Map2Slice(databases map[string][]string) []string {
 	var collections []string
 	for db, cols := range databases {
@@ -112,6 +110,6 @@ func Map2Slice(databases map[string][]string) []string {
 	return collections
 }
 
-func Bson2String(){
+func Bson2String() {
 
 }
